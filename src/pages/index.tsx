@@ -1,9 +1,10 @@
 import Head from "next/head";
 import { useState } from "react";
+import { api } from "@/utils/api";
+import { revalidatePath } from "next/cache";
+
 
 export default function Home() {
-
-  const [eventName, setEventName] = useState("")
 
   return (
     <>
@@ -13,8 +14,9 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        NFC-Ticket!!!
+        <h1>Home</h1>
       </main>
     </>
-  );
+  )
+
 }
