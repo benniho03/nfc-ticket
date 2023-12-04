@@ -1,12 +1,13 @@
 import Head from "next/head";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { useUser } from "@clerk/nextjs";
+import Link from "next/link";
 
 export default function Home() {
-  
+
   const { user, isSignedIn } = useUser()
 
-  if(!isSignedIn) return <div>Not signed in</div>
+  if (!isSignedIn) return <div>Not signed in</div>
 
   return (
     <>
@@ -17,7 +18,12 @@ export default function Home() {
       </Head>
       <main>
         <h1>Home</h1>
-        <p>You are: {user.firstName}</p>
+        <p className="">You are: {user.firstName}</p>
+        <div className="flex gap-4">
+
+          <Link href="/admin">Admin</Link>
+          <Link href="/event">Events</Link>
+        </div>
       </main>
     </>
   )

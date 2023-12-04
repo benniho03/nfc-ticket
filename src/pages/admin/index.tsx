@@ -3,7 +3,7 @@ export default function Page() {
         <>
             <h1>Admin</h1>
             <div>
-                <a href="/admin/create-event">Create Event</a>
+                <a href="/event/create-event">Create Event</a>
             </div>
         </>
     )
