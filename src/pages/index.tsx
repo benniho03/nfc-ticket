@@ -1,10 +1,12 @@
 import Head from "next/head";
-import { useState } from "react";
-import { api } from "@/utils/api";
-import { revalidatePath } from "next/cache";
-
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
+import { useUser } from "@clerk/nextjs";
 
 export default function Home() {
+  
+  const { user, isSignedIn } = useUser()
+
+  if(!isSignedIn) return <div>Not signed in</div>
 
   return (
     <>
@@ -15,6 +17,7 @@ export default function Home() {
       </Head>
       <main>
         <h1>Home</h1>
+        <p>You are: {user.firstName}</p>
       </main>
     </>
   )
