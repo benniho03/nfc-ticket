@@ -28,9 +28,8 @@ model Event {
     location       String
     locationAdress String
     ticketPrice    Float
-    ticketAmount   Int
-
-    tickets Ticket[]
+    maxTicketAmount   Int
+    ticketsSold    Int
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -40,13 +39,13 @@ model Event {
 
 model Ticket {
     id        String   @id @default(uuid())
-    Event     Event    @relation(fields: [id], references: [id])
+    price     Float
+    eventId   String
 
-    firstName String
-    lastName  String
+    userId    String
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    @@index([id, firstName, lastName])
+    @@index([id, userId])
 }
