@@ -23,12 +23,11 @@ export default function Page() {
         mutate(formatEventDetails(eventDetails))
     }
 
-
     return (
         <>
             <h1>Create Event</h1>
             {isLoading && <div>loading...</div>}
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={() => handleSubmit(onSubmit)}>
                 <div>
                     <label htmlFor="name">Event Name</label>
                     <input type="text" {...register("name", { required: true })} id="name" />
