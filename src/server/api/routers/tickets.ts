@@ -53,5 +53,5 @@ export const ticketRouter = createTRPCRouter({
         return ctx.db.post.findFirst({
             orderBy: { createdAt: "desc" },
         });
-    }),
+    })
 });
