@@ -11,7 +11,7 @@ type SuccessfulValidation = {
 
 type InvalidUserInput = {
     message: string;
-    expected: any,
+    expected: Record<string, string>,
 }
 
 type WrongHttpReq = {
