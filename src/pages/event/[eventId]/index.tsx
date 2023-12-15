@@ -1,15 +1,18 @@
 import { EventDetails } from "@/server/api/routers/events";
 import { api } from "@/utils/api";
-import { auth, useUser } from "@clerk/nextjs";
-import { getAuth } from "@clerk/nextjs/server";
+import { SignInButton, auth, useUser } from "@clerk/nextjs";
 import { InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
-export default function Page({ userId }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Page() {
     const router = useRouter()
     const eventId = router.query.eventId as string
+
+    const { user, isSignedIn } = useUser()
+    if(!user || !isSignedIn) return <div><SignInButton /></div>
+    const userId = user?.id
 
     const { data: event, isLoading, error } = api.event.getOne.useQuery({ eventId })
 
@@ -29,11 +32,12 @@ export default function Page({ userId }: InferGetServerSidePropsType<typeof getS
             <p>{event.locationAdress}</p>
             <p>{event.ticketPrice}</p>
             <p>{event.maxTicketAmount}</p>
+            <TicketShop {...event} userId={userId} />
         </>
     )
 }
 
-function TicketShop({ id: eventId, maxTicketAmount, ticketsSold, ticketPrice, userId }: EventDetails & InferGetServerSidePropsType<typeof getServerSideProps>) {
+function TicketShop({ id: eventId, maxTicketAmount, ticketsSold, ticketPrice, userId }: EventDetails & { userId: string }) {
 
     const { mutate, isLoading, error } = api.ticket.create.useMutation()
     const { handleSubmit, formState: { errors }, register } = useForm<TicketUserInput>()
@@ -84,23 +88,4 @@ function TicketShop({ id: eventId, maxTicketAmount, ticketsSold, ticketPrice, us
 function getRemainingTicketPercentage(maxTicketAmount: number, ticketsSold: number) {
     if (ticketsSold === 0) return 100
     return (1 - (maxTicketAmount / ticketsSold) * 100).toFixed()
-}
-
-function getServerSideProps() {
-
-    const { user, isSignedIn } = useUser()
-
-    if (!isSignedIn) return {
-        redirect: {
-            destination: "/",
-            permanent: false
-        }
-    }
-
-    return {
-        props: {
-            userId: user?.id
-        }
-    }
-
 }

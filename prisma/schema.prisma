@@ -6,10 +6,11 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+    provider  = "postgresql"
+    url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
+    directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
+
 // Old schema
 model Post {
     id        Int      @id @default(autoincrement())
@@ -21,15 +22,15 @@ model Post {
 }
 
 model Event {
-    id             String   @id @default(uuid())
-    name           String
-    description    String
-    date           DateTime
-    location       String
-    locationAdress String
-    ticketPrice    Float
-    maxTicketAmount   Int
-    ticketsSold    Int
+    id              String   @id @default(uuid())
+    name            String
+    description     String
+    date            DateTime
+    location        String
+    locationAdress  String
+    ticketPrice     Float
+    maxTicketAmount Int
+    ticketsSold     Int
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -38,14 +39,58 @@ model Event {
 }
 
 model Ticket {
-    id        String   @id @default(uuid())
-    price     Float
-    eventId   String
+    id      String @id @default(uuid())
+    price   Float
+    eventId String
 
-    userId    String
+    genre Genre @default(HIPHOP)
+
+    status TicketStatus @default(OPEN)
+
+    userId String
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
     @@index([id, userId])
+}
+
+enum Genre {
+    ROCK
+    POP
+    JAZZ
+    CLASSIC
+    METAL
+    HIPHOP
+    RAP
+    ELECTRONIC
+    REGGAE
+    COUNTRY
+    BLUES
+    FOLK
+    PUNK
+    SOUL
+    FUNK
+    DISCO
+    HOUSE
+    TECHNO
+    TRANCE
+    DANCE
+    DUBSTEP
+    DRUMNBASS
+    AMBIENT
+    CHILL
+    TRAP
+    INDIE
+    ALTERNATIVE
+    RNB
+    LATIN
+    KPOP
+    OTHER
+}
+
+enum TicketStatus {
+    OPEN
+    CLOSED
+    CANCELLED
 }
