@@ -53,7 +53,7 @@ export default async function handler(
         return
     }
 
-    res.status(200).json({ message: 'Valid ticket', name: "Name noch nicht hinterlegt" })
+    res.status(200).json({ message: 'Valid ticket', name: `${ticket.firstname} ${ticket.lastname}` })
 }
 
 function checkUserInput(userInput: unknown): userInput is TicketInfo {
