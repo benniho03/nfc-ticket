@@ -48,6 +48,8 @@ model Ticket {
     status TicketStatus @default(OPEN)
 
     userId String
+    firstname String @default("NOT SET")
+    lastname String @default("NOT SET")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
