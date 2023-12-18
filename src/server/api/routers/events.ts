@@ -8,6 +8,12 @@ export const ticketSchema = z.object({
     price: z.number(),
 });
 
+export const ticketOrder = z.array(z.object({
+    eventId: z.string(),
+    firstName: z.string(),
+    lastName: z.string()
+}))
+
 const eventSchema = z.object({
     id: z.string(),
     name: z.string(),

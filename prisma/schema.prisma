@@ -42,21 +42,17 @@ model Event {
 
 model Ticket {
     id      String @id @default(uuid())
-    price   Float
     eventId String
-
-    genre Genre @default(HIPHOP)
 
     status TicketStatus @default(OPEN)
 
-    userId String
-    firstname String @default("NOT SET")
-    lastname String @default("NOT SET")
+    firstname String
+    lastname String
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    @@index([id, userId])
+    @@index([id])
 }
 
 enum Genre {
