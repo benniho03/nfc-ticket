@@ -79,7 +79,6 @@ module.exports = withUt({
     },
   },
   plugins: [
-    require('flowbite/plugin'),
     require("tailwindcss-animate")
   ],
 
