@@ -30,6 +30,7 @@ const createEventInputSchema = z.object({
     locationAdress: z.string(),
     ticketPrice: z.number(),
     maxTicketAmount: z.number(),
+    imageUrl: z.string(),
 });
 
 export const eventRouter = createTRPCRouter({
@@ -46,6 +47,7 @@ export const eventRouter = createTRPCRouter({
                     ticketPrice: input.ticketPrice,
                     maxTicketAmount: input.maxTicketAmount,
                     ticketsSold: 0,
+                    imageUrl: input.imageUrl
                 }
             })
         }),
