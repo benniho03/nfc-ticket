@@ -5,11 +5,13 @@ const { withUt } = require("uploadthing/tw");
 module.exports = withUt({
   darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
-	],
+    "./src/**/*.tsx",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    ".src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/**/*.{js,ts,jsx,tsx,mdx}",
+    "./node_modules/flowbite/**/*.js",
+  ],
   theme: {
     container: {
       center: true,
@@ -75,5 +77,9 @@ module.exports = withUt({
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
-})
+  plugins: [
+    require('flowbite/plugin'),
+    require("tailwindcss-animate")
+  ],
+  
+} satisfies Config;
