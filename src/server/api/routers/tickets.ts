@@ -16,17 +16,22 @@ export const ticketRouter = createTRPCRouter({
         });
     }),
     order: publicProcedure
-    .input(ticketOrder)
-    .mutation(async ({ctx, input }) => {
-        console.log(input)
-        return input.map(async ticket => {
-            return await ctx.db.ticket.create({
-                data: {
-                    eventId: ticket.eventId,
-                    firstname: ticket.firstName,
-                    lastname: ticket.lastName
+        .input(ticketOrder)
+        .mutation(async ({ ctx, input }) => {
+            console.log(input)
+            return await Promise.all(input.map(async ticket => {
+                try {
+                    console.log(ticket.eventId)
+                    return await ctx.db.ticket.create({
+                        data: {
+                            eventId: ticket.eventId,
+                            firstname: ticket.firstName,
+                            lastname: ticket.lastName
+                        }
+                    })
+                } catch (error) {
+                    console.error(error)
                 }
-            })
+            }))
         })
-    })
 });
