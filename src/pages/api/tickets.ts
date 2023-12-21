@@ -60,13 +60,14 @@ export default async function handler(
     }
 
     if(ticket.status == "CANCELLED"){
-        res.status(200).json({ message: 'Ticket was cancelled', name: `${ticket.firstname} ${ticket.lastname}`, status: ticket.status})
+        res.status(200).json({ message: 'Ticket is cancelled', name: `${ticket.firstname} ${ticket.lastname}`, status: ticket.status})
         return
     }
 
     // läuft nur so weit, wenn ticket OPEN ist
     res.status(200).json({ message: 'Valid ticket', name: `${ticket.firstname} ${ticket.lastname}`, status: ticket.status})
-    // status in DB muss auf Closed gesetzt werde
+    // status in DB muss auf Closed gesetzt werden
+    ticketUsed(ticket.id, ticket.eventId)
 }
 
 function checkUserInput(userInput: unknown): userInput is TicketInfo {
@@ -77,12 +78,21 @@ async function getTicketInfo(ticketId: string, eventId: string){
     const prisma = new PrismaClient();
     return await prisma.ticket.findFirst({
         where: {
-            id: {
-                equals: ticketId
-            },
-            eventId: {
-                equals: eventId
-            }
+            id: ticketId,
+            eventId: eventId
+        }
+    });
+}
+
+async function ticketUsed(ticketId: string, eventId: string){
+    const prisma = new PrismaClient();
+    await prisma.ticket.update({
+        where: {
+            id: ticketId,
+            eventId: eventId
+        },
+        data: {
+            status: 'CLOSED'
         }
     });
 }
