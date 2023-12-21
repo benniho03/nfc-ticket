@@ -6,7 +6,8 @@ type ResponseData = SuccessfulValidation | InvalidUserInput | WrongHttpReq | NoT
 
 type SuccessfulValidation = {
     message: string,
-    name: string
+    name: string,
+    status: string
 }
 
 type InvalidUserInput = {
@@ -51,9 +52,21 @@ export default async function handler(
     if(!ticket){
         res.status(400).json({ message: 'Ticket doesnt exsits' });
         return
+    }    
+    
+    if(ticket.status == "CLOSED"){
+        res.status(200).json({ message: 'Ticket already used', name: `${ticket.firstname} ${ticket.lastname}`, status: ticket.status})
+        return
     }
 
-    res.status(200).json({ message: 'Valid ticket', name: `${ticket.firstname} ${ticket.lastname}` })
+    if(ticket.status == "CANCELLED"){
+        res.status(200).json({ message: 'Ticket was cancelled', name: `${ticket.firstname} ${ticket.lastname}`, status: ticket.status})
+        return
+    }
+
+    // läuft nur so weit, wenn ticket OPEN ist
+    res.status(200).json({ message: 'Valid ticket', name: `${ticket.firstname} ${ticket.lastname}`, status: ticket.status})
+    // status in DB muss auf Closed gesetzt werde
 }
 
 function checkUserInput(userInput: unknown): userInput is TicketInfo {
