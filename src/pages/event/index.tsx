@@ -27,6 +27,7 @@ export default function EventOverview() {
                 <button onClick={() => toast.success("Hi!")}>Click</button>
 
                 <h1>Event Overview</h1>
+                <div>{allEvents.length}</div>
                 <div className="flex flex-wrap gap-2">
                     {
                         allEvents.map((event) => (

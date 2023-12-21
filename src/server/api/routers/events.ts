@@ -24,6 +24,7 @@ const eventSchema = z.object({
     ticketPrice: z.number(),
     maxTicketAmount: z.number(),
     ticketsSold: z.number(),
+    imageUrl: z.string(),
 });
 
 export type EventDetails = z.infer<typeof eventSchema>;
