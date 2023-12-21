@@ -8,6 +8,12 @@ export const ticketSchema = z.object({
     price: z.number(),
 });
 
+export const ticketOrder = z.array(z.object({
+    eventId: z.string(),
+    firstName: z.string(),
+    lastName: z.string()
+}))
+
 const eventSchema = z.object({
     id: z.string(),
     name: z.string(),
@@ -18,6 +24,7 @@ const eventSchema = z.object({
     ticketPrice: z.number(),
     maxTicketAmount: z.number(),
     ticketsSold: z.number(),
+    imageUrl: z.string(),
 });
 
 export type EventDetails = z.infer<typeof eventSchema>;
@@ -30,6 +37,7 @@ const createEventInputSchema = z.object({
     locationAdress: z.string(),
     ticketPrice: z.number(),
     maxTicketAmount: z.number(),
+    imageUrl: z.string(),
 });
 
 export const eventRouter = createTRPCRouter({
@@ -46,6 +54,7 @@ export const eventRouter = createTRPCRouter({
                     ticketPrice: input.ticketPrice,
                     maxTicketAmount: input.maxTicketAmount,
                     ticketsSold: 0,
+                    imageUrl: input.imageUrl
                 }
             })
         }),

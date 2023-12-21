@@ -32,6 +32,8 @@ model Event {
     maxTicketAmount Int
     ticketsSold     Int
 
+    imageUrl       String
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
@@ -40,19 +42,17 @@ model Event {
 
 model Ticket {
     id      String @id @default(uuid())
-    price   Float
     eventId String
-
-    genre Genre @default(HIPHOP)
 
     status TicketStatus @default(OPEN)
 
-    userId String
+    firstname String
+    lastname String
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    @@index([id, userId])
+    @@index([id])
 }
 
 enum Genre {
