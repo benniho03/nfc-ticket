@@ -11,12 +11,12 @@ export default function Page() {
     const eventId = router.query.eventId as string
 
     const { user, isSignedIn } = useUser()
-    if(!user || !isSignedIn) return <div><SignInButton /></div>
+    if (!user || !isSignedIn) return <div><SignInButton /></div>
     const userId = user?.id
 
     const { data: event, isLoading, error } = api.event.getOne.useQuery({ eventId })
 
-    if(!userId) return <div>Not signed in</div>
+    if (!userId) return <div>Not signed in</div>
 
     if (isLoading) return <div>Loading...</div>
     if (error) return <div>An Error Occured</div>
@@ -32,56 +32,7 @@ export default function Page() {
             <p>{event.locationAdress}</p>
             <p>{event.ticketPrice}</p>
             <p>{event.maxTicketAmount}</p>
-            <TicketShop {...event} userId={userId} />
         </>
-    )
-}
-
-function TicketShop({ id: eventId, maxTicketAmount, ticketsSold, ticketPrice, userId }: EventDetails & { userId: string }) {
-
-    const { mutate, isLoading, error } = api.ticket.create.useMutation()
-    const { handleSubmit, formState: { errors }, register } = useForm<TicketUserInput>()
-
-    if (error) toast.error(error.message, {
-        icon: "❌"
-    })
-    if (isLoading) toast.loading("Loading...")
-
-    type TicketUserInput = {
-        amount: number,
-        eventId: string
-    }
-
-
-    function onSubmit({ amount }: TicketUserInput) {
-
-        if (!userId) return toast.error("You need to be logged in to buy a ticket")
-
-        amount = Number(amount)
-
-        mutate({ amount, eventId, userId })
-        if (error) return
-        toast.success(`Bought ${amount} Tickets`)
-
-    }
-
-    return (
-        <div>
-            <p>Nuzter: {userId}</p>
-            <h2>Want to buy a ticket?</h2>
-            <div>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <label htmlFor="amount">Amount</label>
-                    <input type="text" id="amount" {...register("amount")} />
-                    {errors.amount && <div>{errors.amount.message}</div>}
-                    <button type="submit">Buy</button>
-                </form>
-            </div>
-
-            <p>Noch {getRemainingTicketPercentage(maxTicketAmount, ticketsSold)} % der Tickets verbleibend!</p>
-            <p>{ticketsSold}</p>
-            <p>{ticketPrice}</p>
-        </div>
     )
 }
 
