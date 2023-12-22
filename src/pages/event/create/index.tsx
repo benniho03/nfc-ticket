@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { RouterOutputs, api } from "@/utils/api"
 import { UploadButton, UploadDropzone } from "@/utils/uploadthing"
+import { Prisma } from "@prisma/client"
 import Image from "next/image"
 import { useRef, useState } from "react"
 import { useForm } from "react-hook-form"
@@ -39,6 +40,12 @@ export default function Page() {
             reset()
         }
     })
+
+    const genres = Prisma.dmmf.datamodel.enums.find((enumDefinition) => {
+        return enumDefinition.name === 'YourEnumName';
+    })
+
+    console.log(genres)
 
     const { register, handleSubmit, formState: { errors }, reset } = useForm<EventUserInput>()
 
