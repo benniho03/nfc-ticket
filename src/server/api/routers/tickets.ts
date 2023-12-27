@@ -16,12 +16,32 @@ export const ticketRouter = createTRPCRouter({
         });
     }),
     order: publicProcedure
-        .input(ticketOrder)
+        .input(ticketOrder.min(1))
         .mutation(async ({ ctx, input }) => {
-            console.log(input)
+            console.log("Inputerino", input[0]?.eventId)
+            const previousTicketsSold = await ctx.db.event.findFirst({
+                where: {
+                    id: input[0]?.eventId
+                },
+                select: {
+                    ticketsSold: true
+                }
+            })
+            console.log("ticketssoldus", previousTicketsSold)
+            if (!previousTicketsSold) {
+                throw new TRPCError({ message: "no ticketsSold", code: "INTERNAL_SERVER_ERROR" })
+            }
+            await ctx.db.event.update({
+                data: {
+                    ticketsSold: previousTicketsSold.ticketsSold + input.length
+                },
+                where: {
+                    id: input[0]?.eventId
+                }
+            }
+            )
             return await Promise.all(input.map(async ticket => {
                 try {
-                    console.log(ticket.eventId)
                     return await ctx.db.ticket.create({
                         data: {
                             eventId: ticket.eventId,

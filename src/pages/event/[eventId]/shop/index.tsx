@@ -34,9 +34,11 @@ export default function Shop({ eventId }: InferGetServerSidePropsType<typeof get
     });
     const { mutate } = api.ticket.order.useMutation()
 
+    const ticketAmount = 1;
+
     const { data: event } = api.event.getOne.useQuery({ eventId })
 
-    if(!event) return <div>404</div>
+    if (!event) return <div>404</div>
 
     function formatTicketData(ticketDetails: TicketShop) {
         return ticketDetails.tickets
@@ -57,6 +59,10 @@ export default function Shop({ eventId }: InferGetServerSidePropsType<typeof get
     return (
         <>
             <h1>Ticket-Shop yeah für {event.name}</h1>
+            <p>
+                Noch verfügbare Tickets: {event.maxTicketAmount - event.ticketsSold}
+                /{event.maxTicketAmount}
+            </p>
             {errors.tickets && <span>Bitte fülle alle Felder aus!</span>}
             <form onSubmit={handleSubmit(buyTickets)}>
                 {
@@ -104,7 +110,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext<{ ev
 
     const eventId = context.params?.eventId as string;
 
-    if(!eventId) throw new Error("No eventId provided")
+    if (!eventId) throw new Error("No eventId provided")
 
     await ssr.event.getOne.prefetch({ eventId });
 
