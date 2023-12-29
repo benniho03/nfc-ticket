@@ -8,6 +8,8 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { redirect } from "next/navigation";
 import { Form, FormLabel } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
+import toast from "react-hot-toast";
+import { useState } from "react";
 
 type TicketShop = {
     tickets: {
@@ -20,7 +22,7 @@ type TicketShop = {
 
 export default function Shop({ eventId }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 
-    const { control, register, handleSubmit, formState: { errors } } = useForm<TicketShop>({
+    const { control, register, handleSubmit, formState: { errors, isSubmitSuccessful }, reset } = useForm<TicketShop>({
         defaultValues: {
             tickets: [{
                 owner: {
@@ -30,17 +32,27 @@ export default function Shop({ eventId }: InferGetServerSidePropsType<typeof get
             }]
         }
     });
+
     const { fields, append } = useFieldArray({
         control, // control props comes from useForm (optional: if you are using FormContext)
         name: "tickets", // unique name for your Field Array
     });
-    const { mutate } = api.ticket.order.useMutation()
 
-    const ticketAmount = 1;
+    const { mutate } = api.ticket.order.useMutation({
+        onSuccess() {
+            toast.success("Tickets erfolgreich bestellt.")
+            reset()
+        },
+        onError() {
+            toast.error("Keine Tickets für dieses Event verfügbar.")
+        }
+    })
 
     const { data: event } = api.event.getOne.useQuery({ eventId })
 
     if (!event) return <div>404</div>
+
+    const [ticketsSold, setTicketsSold] = useState(event.ticketsSold)
 
     function formatTicketData(ticketDetails: TicketShop) {
         return ticketDetails.tickets
@@ -55,7 +67,8 @@ export default function Shop({ eventId }: InferGetServerSidePropsType<typeof get
 
     function buyTickets(ticketDetails: TicketShop) {
         mutate(formatTicketData(ticketDetails))
-        console.log(formatTicketData(ticketDetails))
+        if (ticketsSold === event?.maxTicketAmount) return
+        setTicketsSold(ticketsSold + ticketDetails.tickets.length)
     }
 
     return (
@@ -66,7 +79,7 @@ export default function Shop({ eventId }: InferGetServerSidePropsType<typeof get
                 </div>
                 <div className="container py-3 bg-slate-700 text-slate-50">
                     <p>
-                        Noch verfügbare Tickets: {event.maxTicketAmount - event.ticketsSold}
+                        Noch verfügbare Tickets: {event.maxTicketAmount - ticketsSold}
                         /{event.maxTicketAmount}
                     </p>
                     {errors.tickets && <span>Bitte fülle alle Felder aus!</span>}

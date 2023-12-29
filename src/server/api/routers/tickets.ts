@@ -31,7 +31,7 @@ export const ticketRouter = createTRPCRouter({
                 throw new TRPCError({ message: "no ticketsSold", code: "INTERNAL_SERVER_ERROR" })
             }
             if (ticketAmount.ticketsSold >= ticketAmount.maxTicketAmount) {
-                throw new TRPCError({ message: "no more tickets available", code: "FORBIDDEN" })
+                throw new TRPCError({ message: "no more tickets available", code: "BAD_REQUEST" })
             }
             await ctx.db.event.update({
                 data: {
@@ -43,21 +43,6 @@ export const ticketRouter = createTRPCRouter({
             }
             )
             return await Promise.all(input.map(async ticket => {
-                const ticketAmount = await ctx.db.event.findFirst({
-                    where: {
-                        id: input[0]?.eventId
-                    },
-                    select: {
-                        maxTicketAmount: true,
-                        ticketsSold: true,
-                    }
-                })
-                if (!ticketAmount) {
-                    throw new TRPCError({ message: "no ticketsSold", code: "INTERNAL_SERVER_ERROR" })
-                }
-                if (ticketAmount.ticketsSold > ticketAmount.maxTicketAmount) {
-                    throw new TRPCError({ message: "no more tickets available", code: "FORBIDDEN" })
-                }
                 try {
                     return await ctx.db.ticket.create({
                         data: {

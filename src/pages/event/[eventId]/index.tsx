@@ -59,9 +59,10 @@ export default function Page({ eventId }: InferGetServerSidePropsType<typeof get
                             Noch verfügbare Tickets: {event.maxTicketAmount - event.ticketsSold}
                             /{event.maxTicketAmount}
                         </p>
+                        <Link href={event.id + "/shop"}>Shop</Link>
                     </div>
                 </div>
-            </div>
+            </div >
         </>
     );
 }
