@@ -1,7 +1,11 @@
+import { appRouter } from "@/server/api/root";
+import { db } from "@/server/db";
 import { api } from "@/utils/api"
-import { useRouter } from "next/router"
-import { useState } from "react";
+import { createServerSideHelpers } from "@trpc/react-query/server";
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
+import superjson from "superjson";
 import { useFieldArray, useForm } from "react-hook-form";
+import { redirect } from "next/navigation";
 
 type TicketShop = {
     tickets: {
@@ -12,7 +16,8 @@ type TicketShop = {
     }[]
 }
 
-export default function Shop() {
+export default function Shop({ eventId }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+
     const { control, register, handleSubmit, formState: { errors } } = useForm<TicketShop>({
         defaultValues: {
             tickets: [{
@@ -27,15 +32,11 @@ export default function Shop() {
         control, // control props comes from useForm (optional: if you are using FormContext)
         name: "tickets", // unique name for your Field Array
     });
-    const router = useRouter()
-    const eventId = router.query.eventId as string
     const { mutate } = api.ticket.order.useMutation()
 
-    const { data: event, isLoading, error } = api.event.getOne.useQuery({ eventId })
+    const { data: event } = api.event.getOne.useQuery({ eventId })
 
-    if (isLoading) return <div>Loading...</div>
-    if (error) return <div>An Error Occured</div>
-    if (!event) return <div>404</div>
+    if(!event) return <div>404</div>
 
     function formatTicketData(ticketDetails: TicketShop) {
         return ticketDetails.tickets
@@ -67,14 +68,12 @@ export default function Shop() {
                                     <input type="text" id={`firstName${index}`} {...register(`tickets.${index}.owner.firstName`, {
                                         required: true
                                     })} />
-                                    {/* {errors.tickets && <span>Vorname fehlt</span>} */}
                                 </div>
                                 <div>
                                     <label htmlFor={`lastName${index}`}>Nachname</label>
                                     <input type="text" id={`lastName${index}`} {...register(`tickets.${index}.owner.lastName`, {
                                         required: true
                                     })} />
-                                    {/* {errors.tickets && <span>{errors.tickets[index]!.message} jojo</span>} */}
                                 </div>
                             </div>
                         )
@@ -91,4 +90,28 @@ export default function Shop() {
             </form>
         </>
     )
+}
+
+export async function getServerSideProps(context: GetServerSidePropsContext<{ eventId: string }>) {
+
+    const ssr = createServerSideHelpers({
+        router: appRouter,
+        ctx: {
+            db
+        },
+        transformer: superjson,
+    });
+
+    const eventId = context.params?.eventId as string;
+
+    if(!eventId) throw new Error("No eventId provided")
+
+    await ssr.event.getOne.prefetch({ eventId });
+
+    return {
+        props: {
+            trpcState: ssr.dehydrate(),
+            eventId
+        }
+    }
 }

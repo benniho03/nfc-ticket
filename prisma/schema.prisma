@@ -55,6 +55,7 @@ model Ticket {
     @@index([id])
 }
 
+
 enum Genre {
     ROCK
     POP

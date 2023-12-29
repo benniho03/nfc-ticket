@@ -7,6 +7,10 @@ import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import {EventSlider} from "@/components/event-slider"
 import NavBar from "@/components/header-navigation";
 import Footer from "@/components/footer-navigation"
+import superjson from "superjson"
+import { db } from "@/server/db"
+import { createServerSideHelpers } from "@trpc/react-query/server"
+import { appRouter } from "@/server/api/root"
 
 
 
@@ -14,15 +18,15 @@ export default function EventOverview() {
 
     const { data: allEvents, isLoading, error } = api.event.getAll.useQuery()
 
+    if (isLoading) return console.log("Loading?")
     if (error) return <div>An Error Occured</div>
-    if (isLoading) return <div>Loading...</div>
 
     const { user, isLoaded, isSignedIn } = useUser()
 
-    if(!isSignedIn || !isLoaded || !user) return <div>Not signed in</div>
+    if (!isSignedIn || !isLoaded || !user) return <div>Not signed in</div>
 
 
-    if(!allEvents) return <div>No Events found</div>
+    if (!allEvents) return <div>No Events found</div>
     return (
         <>
             <div className="max-w-6xl mx-auto">
@@ -50,7 +54,6 @@ export default function EventOverview() {
                     //     ))
                      }
                     </div>
-                
             </div>
             <Footer/>
         </>
@@ -78,29 +81,50 @@ function EventDisplay(event: EventDetails) {
     )
 }
 
-function SortedEventSlider(event: EventDetails ){
-    return( <div className="overflow-hidden relative">
-    <div className="flex transition ease-out duration-100">
+function SortedEventSlider(event: EventDetails) {
+    return (<div className="overflow-hidden relative">
+        <div className="flex transition ease-out duration-100">
             <p>Event: {event.name}</p>
             <p>Ort: {event.location}</p>
             <p>Datum: {event.date.toLocaleDateString()}</p>
-    </div>
+        </div>
     </div>
 
     )
 }
 
+export async function getServerSideProps() {
+
+    const ssr = createServerSideHelpers({
+        router: appRouter,
+        ctx: {
+            db
+        },
+        transformer: superjson,
+    });
+
+
+    await ssr.event.getAll.prefetch()
+
+    return {
+        props: {
+            trpcState: ssr.dehydrate(),
+        }
+    }
+}
+
 type SortOptions = "DATE" | "ARTIST"
 
 
-function sortEvents(events : EventDetails[], sortBy: SortOptions){
-    switch(sortBy){
+function sortEvents(events: EventDetails[], sortBy: SortOptions) {
+    switch (sortBy) {
         case "DATE":
             return [...events].sort((first, second) => first.date.getTime() - second.date.getTime())
         default:
             return []
     }
- 
+
 
 
 }
+
