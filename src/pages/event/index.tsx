@@ -8,8 +8,7 @@ import { EventSlider } from "@/components/event-slider"
 import { db } from "@/server/db"
 import { createServerSideHelpers } from "@trpc/react-query/server"
 import { appRouter } from "@/server/api/root"
-
-
+import { SelectFilter } from "@/components/filter"
 
 export default function EventOverview() {
 
@@ -26,12 +25,12 @@ export default function EventOverview() {
     if (!allEvents) return <div>No Events found</div>
     return (
         <>
-            <div className="max-w-6xl mx-auto">
+            <div className="max-w-6xl mx-auto mt-11">
                 <button onClick={() => toast.success("Hi!")}>Click</button>
 
-                <h1>Event Overview</h1>
-                <div>{allEvents.length}</div>
-                <div className="flex flex-wrap gap-2">
+                <h1 className="font-black text-8xl">Event Overview</h1>
+                <SelectFilter/>
+                <div className="flex flex-wrap gap-5">
                     {
                         allEvents.map((event) => (
                             <EventDisplay {...event} />
@@ -39,7 +38,7 @@ export default function EventOverview() {
                     }
                 </div>
             </div>
-            <div className="max-w-[40%] mx-auto pt-11">
+            <div className="max-w-[40%] mx-auto pt-11 ">
                 <div className="flex flex-wrap gap-2">
                     <EventSlider events={sortEvents(allEvents, "DATE")} />
                     {
@@ -58,21 +57,26 @@ export default function EventOverview() {
 function EventDisplay(event: EventDetails) {
 
     return (
-        <div className="w-1/2 sm:w-1/3 md:w-1/4 flex flex-col border p-2">
+
+        <div className="w-1/2 sm:w-1/3 md:w-1/4 flex flex-col  bg-slate-700">
             <img
                 className="w-full object-cover aspect-video"
                 src="https://image.mymixtapez.com/albums/257489/cover/0/large"
                 alt={event.name} />
-            <span className="font-bold text-center text-2xl">{event.name}</span>
-            <p>{truncateText(event.description, 100)}</p>
-            <p>Datum: {event.date.toLocaleDateString()}</p>
-            <p>Ort: {event.location}</p>
-            <div className="w-1/2 rounded text-center px-2 py-1 bg-sky-700 text-white">
+             <div className="p-3"> 
+            <span className="uppercase font-bold text-2xl text-slate-50 mt-4 ">{event.name}</span>
+            <p className="font-bold text-slate-300">Datum: {event.date.toLocaleDateString()}</p>
+            <p className="font-bold text-slate-300">Ort: {event.location}</p>
+            <p className="text-slate-50 mt-3">{truncateText(event.description, 100)}</p>
+            <div className="w-1/2 rounded text-center px-2 py-1 bg-pink-700 text-white mt-4">
                 <Link href={`/event/${event.id}`}>
                     Zum Event
                 </Link>
             </div>
-        </div>
+            </div>  
+        </div>      
+
+
     )
 }
 
