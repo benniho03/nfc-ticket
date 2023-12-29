@@ -3,6 +3,7 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 
+
 export default function Home() {
 
   const { user, isSignedIn } = useUser()
