@@ -16,12 +16,34 @@ export const ticketRouter = createTRPCRouter({
         });
     }),
     order: publicProcedure
-        .input(ticketOrder)
+        .input(ticketOrder.min(1))
         .mutation(async ({ ctx, input }) => {
-            console.log(input)
+            const ticketAmount = await ctx.db.event.findFirst({
+                where: {
+                    id: input[0]?.eventId
+                },
+                select: {
+                    ticketsSold: true,
+                    maxTicketAmount: true
+                }
+            })
+            if (!ticketAmount) {
+                throw new TRPCError({ message: "no ticketsSold", code: "INTERNAL_SERVER_ERROR" })
+            }
+            if (ticketAmount.ticketsSold >= ticketAmount.maxTicketAmount) {
+                throw new TRPCError({ message: "no more tickets available", code: "BAD_REQUEST" })
+            }
+            await ctx.db.event.update({
+                data: {
+                    ticketsSold: ticketAmount.ticketsSold + input.length
+                },
+                where: {
+                    id: input[0]?.eventId
+                }
+            }
+            )
             return await Promise.all(input.map(async ticket => {
                 try {
-                    console.log(ticket.eventId)
                     return await ctx.db.ticket.create({
                         data: {
                             eventId: ticket.eventId,
