@@ -5,6 +5,8 @@ import toast from "react-hot-toast"
 import { useUser } from "@clerk/nextjs"
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import {EventSlider} from "@/components/event-slider"
+import NavBar from "@/components/header-navigation";
+import Footer from "@/components/footer-navigation"
 
 
 
@@ -24,6 +26,7 @@ export default function EventOverview() {
     return (
         <>
             <div className="max-w-6xl mx-auto">
+            <NavBar/>
                 <button onClick={() => toast.success("Hi!")}>Click</button>
 
                 <h1>Event Overview</h1>
@@ -47,7 +50,9 @@ export default function EventOverview() {
                     //     ))
                      }
                     </div>
+                
             </div>
+            <Footer/>
         </>
     )
 }
