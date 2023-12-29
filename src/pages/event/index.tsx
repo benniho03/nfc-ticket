@@ -3,8 +3,11 @@ import Link from "next/link"
 import { api, truncateText } from "@/utils/api"
 import toast from "react-hot-toast"
 import { useUser } from "@clerk/nextjs"
+import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
+import {EventSlider} from "@/components/event-slider"
+import NavBar from "@/components/header-navigation";
+import Footer from "@/components/footer-navigation"
 import superjson from "superjson"
-import { EventSlider } from "@/components/event-slider"
 import { db } from "@/server/db"
 import { createServerSideHelpers } from "@trpc/react-query/server"
 import { appRouter } from "@/server/api/root"
@@ -25,7 +28,12 @@ export default function EventOverview() {
     if (!allEvents) return <div>No Events found</div>
     return (
         <>
+
             <div className="max-w-6xl mx-auto mt-11">
+
+
+            <NavBar/>
+
                 <button onClick={() => toast.success("Hi!")}>Click</button>
 
                 <h1 className="font-black text-8xl">Event Overview</h1>
@@ -38,6 +46,7 @@ export default function EventOverview() {
                     }
                 </div>
             </div>
+
             <div className="max-w-[40%] mx-auto pt-11 ">
                 <div className="flex flex-wrap gap-2">
                     <EventSlider events={sortEvents(allEvents, "DATE")} />
@@ -50,6 +59,7 @@ export default function EventOverview() {
                     }
                 </div>
             </div>
+            <Footer/>
         </>
     )
 }
