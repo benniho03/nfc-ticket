@@ -18,20 +18,24 @@ export const ticketRouter = createTRPCRouter({
     order: publicProcedure
         .input(ticketOrder.min(1))
         .mutation(async ({ ctx, input }) => {
-            const previousTicketsSold = await ctx.db.event.findFirst({
+            const ticketAmount = await ctx.db.event.findFirst({
                 where: {
                     id: input[0]?.eventId
                 },
                 select: {
-                    ticketsSold: true
+                    ticketsSold: true,
+                    maxTicketAmount: true
                 }
             })
-            if (!previousTicketsSold) {
+            if (!ticketAmount) {
                 throw new TRPCError({ message: "no ticketsSold", code: "INTERNAL_SERVER_ERROR" })
+            }
+            if (ticketAmount.ticketsSold >= ticketAmount.maxTicketAmount) {
+                throw new TRPCError({ message: "no more tickets available", code: "FORBIDDEN" })
             }
             await ctx.db.event.update({
                 data: {
-                    ticketsSold: previousTicketsSold.ticketsSold + input.length
+                    ticketsSold: ticketAmount.ticketsSold + input.length
                 },
                 where: {
                     id: input[0]?.eventId
@@ -39,6 +43,21 @@ export const ticketRouter = createTRPCRouter({
             }
             )
             return await Promise.all(input.map(async ticket => {
+                const ticketAmount = await ctx.db.event.findFirst({
+                    where: {
+                        id: input[0]?.eventId
+                    },
+                    select: {
+                        maxTicketAmount: true,
+                        ticketsSold: true,
+                    }
+                })
+                if (!ticketAmount) {
+                    throw new TRPCError({ message: "no ticketsSold", code: "INTERNAL_SERVER_ERROR" })
+                }
+                if (ticketAmount.ticketsSold > ticketAmount.maxTicketAmount) {
+                    throw new TRPCError({ message: "no more tickets available", code: "FORBIDDEN" })
+                }
                 try {
                     return await ctx.db.ticket.create({
                         data: {
