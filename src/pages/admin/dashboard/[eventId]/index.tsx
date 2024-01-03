@@ -39,7 +39,11 @@ export default function EventDashboard({closedCount, openCount}: InferGetServerS
             <h2>{ event.location }, { event.locationAdress }</h2>
             <div style={{ width: '250px' }}>
                 <PieChart label1="Verkaufte Tickets" label2="Unverkaufte Tickets" value1={ event.ticketsSold } value2={ event.maxTicketAmount - event.ticketsSold } />
-                <PieChart label1="Eingecheckt" label2="Noch nicht eingecheckt" value1={ closedCount } value2={ openCount } />
+                {
+                    (openCount != 0 && closedCount != 0) ? (
+                        <PieChart label1="Eingecheckt" label2="Noch nicht eingecheckt" value1={ closedCount } value2={ openCount } />
+                    ) : null
+                }
             </div>
 
             <p>Generierter Umsatz: { event.ticketsSold * event.ticketPrice } €</p>
