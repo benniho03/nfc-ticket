@@ -111,7 +111,8 @@ export async function getServerSideProps() {
     const ssr = createServerSideHelpers({
         router: appRouter,
         ctx: {
-            db
+            db,
+            userId: null
         },
         transformer: superjson,
     });
