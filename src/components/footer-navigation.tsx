@@ -4,10 +4,10 @@ import { useState } from 'react';
 
 function Footer(){
     return(
-        <footer className="bg-slate-950 text-white py-4 px-3 mt-16">
-    <div className=" mx-auto flex flex-wrap items-center justify-end">
+        <footer className="bg-slate-950 text-white py-4 px-3">
+    <div className=" mx-auto flex flex-wrap items-center justify-end container md:flex md:px-8">
         <div className="w-full md:w-1/2 md:text-center md:mb-0 mb-8 justify-end">
-            <ul className="list-reset flex justify-end flex-wrap text-xs md:text-sm gap-3">
+            <ul className="list-reset flex justify-end flex-wrap text-xs md:text-sm gap-3 container">
                 <li><a href="#" className=" hover:text-pink-700">Datenschutz</a></li>
                 <li className="mx-10"><a href="#" className="text-slate-50 hover:text-pink-700">Impressum</a></li>
             </ul>
