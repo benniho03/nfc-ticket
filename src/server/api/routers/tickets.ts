@@ -1,7 +1,11 @@
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
-import { ticketOrder, ticketSchema } from "./events";
+import { ticketOrderSchema, ticketSchema } from "./events";
+import { Resend } from 'resend';
+import { api } from "@/utils/api";
+import { sendTicketEmail } from "./email";
+import { auth, clerkClient, getAuth } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
 
 type TicketDetails = z.infer<typeof ticketSchema>;
@@ -16,12 +20,34 @@ export const ticketRouter = createTRPCRouter({
         });
     }),
     order: publicProcedure
-        .input(ticketOrder)
+        .input(ticketOrderSchema)
         .mutation(async ({ ctx, input }) => {
-            console.log(input)
+
+            if (!ctx.userId) throw new TRPCError({
+                code: "UNAUTHORIZED",
+                message: "You need to be logged in to order tickets"
+            })
+
+            const user = await clerkClient.users.getUser(ctx.userId)
+
+            if (!user) throw new TRPCError({
+                code: "UNAUTHORIZED",
+                message: "You need to be logged in to order tickets"
+            })
+
+
+            const email = user.emailAddresses[0]?.emailAddress
+            console.log(email)
+
+            if (!email) throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "No email found"
+            })
+
+            if (process.env.SEND_EMAIL) sendTicketEmail({ tickets: input, email })
+
             return await Promise.all(input.map(async ticket => {
                 try {
-                    console.log(ticket.eventId)
                     return await ctx.db.ticket.create({
                         data: {
                             eventId: ticket.eventId,

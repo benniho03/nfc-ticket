@@ -6,6 +6,7 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import superjson from "superjson";
 import { useFieldArray, useForm } from "react-hook-form";
 import { redirect } from "next/navigation";
+import { getAuth } from "@clerk/nextjs/server";
 
 type TicketShop = {
     tickets: {
@@ -36,7 +37,7 @@ export default function Shop({ eventId }: InferGetServerSidePropsType<typeof get
 
     const { data: event } = api.event.getOne.useQuery({ eventId })
 
-    if(!event) return <div>404</div>
+    if (!event) return <div>404</div>
 
     function formatTicketData(ticketDetails: TicketShop) {
         return ticketDetails.tickets
@@ -97,14 +98,15 @@ export async function getServerSideProps(context: GetServerSidePropsContext<{ ev
     const ssr = createServerSideHelpers({
         router: appRouter,
         ctx: {
-            db
+            db,
+            userId: null
         },
         transformer: superjson,
     });
 
     const eventId = context.params?.eventId as string;
 
-    if(!eventId) throw new Error("No eventId provided")
+    if (!eventId) throw new Error("No eventId provided")
 
     await ssr.event.getOne.prefetch({ eventId });
 
