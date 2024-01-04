@@ -1,4 +1,5 @@
 import PieChart from "@/components/piechart"
+import { UsersTable } from "@/components/users-table"
 import { api } from "@/utils/api"
 import { PrismaClient } from "@prisma/client"
 import { GetServerSideProps, GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
@@ -20,10 +21,21 @@ export async function getServerSideProps(context: GetServerSidePropsContext){
             status: "OPEN"
         }
     })
-    return { props: { closedCount: cCount, openCount: oCount } }
+    const users = await prisma.ticket.findMany({
+        where: {
+            eventId: eventId
+        },
+        select: {
+            id: true,
+            status: true,
+            firstname: true,
+            lastname: true,
+        }
+    })
+    return { props: { closedCount: cCount, openCount: oCount, users } }
 }
 
-export default function EventDashboard({closedCount, openCount}: InferGetServerSidePropsType<typeof getServerSideProps>){
+export default function EventDashboard({closedCount, openCount, users}: InferGetServerSidePropsType<typeof getServerSideProps>){
     const router = useRouter()
     const eventId = router.query.eventId as string
     const { data: event, isLoading, error } = api.event.getOne.useQuery({ eventId })
@@ -47,6 +59,10 @@ export default function EventDashboard({closedCount, openCount}: InferGetServerS
             </div>
 
             <p>Generierter Umsatz: { event.ticketsSold * event.ticketPrice } €</p>
+
+            <p>Teilnehmerliste</p>
+            <UsersTable users={users} />
+
         </>
     )
 }
