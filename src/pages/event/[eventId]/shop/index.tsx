@@ -7,6 +7,10 @@ import superjson from "superjson";
 import { useFieldArray, useForm } from "react-hook-form";
 import { redirect } from "next/navigation";
 import { getAuth } from "@clerk/nextjs/server";
+import { Form, FormLabel } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import toast from "react-hot-toast";
+import { useState } from "react";
 
 type TicketShop = {
     tickets: {
@@ -19,7 +23,7 @@ type TicketShop = {
 
 export default function Shop({ eventId }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 
-    const { control, register, handleSubmit, formState: { errors } } = useForm<TicketShop>({
+    const { control, register, handleSubmit, formState: { errors, isSubmitSuccessful }, reset } = useForm<TicketShop>({
         defaultValues: {
             tickets: [{
                 owner: {
@@ -29,15 +33,27 @@ export default function Shop({ eventId }: InferGetServerSidePropsType<typeof get
             }]
         }
     });
+
     const { fields, append } = useFieldArray({
         control, // control props comes from useForm (optional: if you are using FormContext)
         name: "tickets", // unique name for your Field Array
     });
-    const { mutate } = api.ticket.order.useMutation()
+
+    const { mutate } = api.ticket.order.useMutation({
+        onSuccess() {
+            toast.success("Tickets erfolgreich bestellt.")
+            reset()
+        },
+        onError() {
+            toast.error("Keine Tickets für dieses Event verfügbar.")
+        }
+    })
 
     const { data: event } = api.event.getOne.useQuery({ eventId })
 
     if (!event) return <div>404</div>
+
+    const [ticketsSold, setTicketsSold] = useState(event.ticketsSold)
 
     function formatTicketData(ticketDetails: TicketShop) {
         return ticketDetails.tickets
@@ -52,43 +68,62 @@ export default function Shop({ eventId }: InferGetServerSidePropsType<typeof get
 
     function buyTickets(ticketDetails: TicketShop) {
         mutate(formatTicketData(ticketDetails))
-        console.log(formatTicketData(ticketDetails))
+        if (ticketsSold === event?.maxTicketAmount) return
+        setTicketsSold(ticketsSold + ticketDetails.tickets.length)
     }
 
     return (
         <>
-            <h1>Ticket-Shop yeah für {event.name}</h1>
-            {errors.tickets && <span>Bitte fülle alle Felder aus!</span>}
-            <form onSubmit={handleSubmit(buyTickets)}>
-                {
-                    fields.map((field, index) => {
-                        return (
-                            <div key={field.id}>
-                                <div>
-                                    <label htmlFor={`firstName${index}`}>Vorname</label>
-                                    <input type="text" id={`firstName${index}`} {...register(`tickets.${index}.owner.firstName`, {
-                                        required: true
-                                    })} />
-                                </div>
-                                <div>
-                                    <label htmlFor={`lastName${index}`}>Nachname</label>
-                                    <input type="text" id={`lastName${index}`} {...register(`tickets.${index}.owner.lastName`, {
-                                        required: true
-                                    })} />
-                                </div>
-                            </div>
-                        )
-                    })
-                }
+            <div className="bg-slate-900 min-h-screen">
+                <div className="container py-2">
+                    <h1 className="text-slate-200 font-bold text-6xl">Ticket-Shop yeah für {event.name}</h1>
+                </div>
+                <div className="container py-3 bg-slate-700 text-slate-50">
+                    <p>
+                        Noch verfügbare Tickets: {event.maxTicketAmount - ticketsSold}
+                        /{event.maxTicketAmount}
+                    </p>
+                    {errors.tickets && <span>Bitte fülle alle Felder aus!</span>}
+                    <form onSubmit={handleSubmit(buyTickets)}>
+                        {
+                            fields.map((field, index) => {
+                                return (
+                                    <div key={field.id}>
+                                        <p className="text-lg">{index + 1}. Person</p>
+                                        <div className="mb-2">
+                                            <label className="font-medium" htmlFor={`firstName${index}`} placeholder={`Vorname der Person ${index}`}>Vorname</label>
+                                            <input className="bg-transparent flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" type="text" id={`firstName${index}`} {...register(`tickets.${index}.owner.firstName`, {
+                                                required: true
+                                            })} />
+                                        </div>
+                                        <div className="mb-3">
+                                            <label className="font-medium" htmlFor={`lastName${index}`}>Nachname</label>
+                                            <input className="bg-transparent flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" type="text" id={`lastName${index}`} {...register(`tickets.${index}.owner.lastName`, {
+                                                required: true
+                                            })} />
+                                        </div>
+                                    </div>
+                                )
+                            })
+                        }
 
-                <button type="button" onClick={() => append({
-                    owner: {
-                        firstName: "",
-                        lastName: ""
-                    }
-                })}>Ticket hinzufügen</button>
-                <button type="submit">Tickets bestellen</button>
-            </form>
+                        <button type="button" onClick={() => append({
+                            owner: {
+                                firstName: "",
+                                lastName: ""
+                            }
+                        })}></button>
+                        <Button className="bg-pink-700 mr-3" type="button" onClick={() => append({
+                            owner: {
+                                firstName: "",
+                                lastName: ""
+                            }
+                        })}>Ticket hinzufügen</Button>
+                        <Button className="bg-pink-700" type="submit">Tickets bestellen</Button>
+                    </form>
+                </div >
+
+            </div >
         </>
     )
 }
