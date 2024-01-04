@@ -80,7 +80,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext<{ ev
   const ssr = createServerSideHelpers({
     router: appRouter,
     ctx: {
-      db
+      db,
+      userId: null
     },
     transformer: superjson,
   });

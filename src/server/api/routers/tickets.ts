@@ -44,7 +44,7 @@ export const ticketRouter = createTRPCRouter({
                 message: "No email found"
             })
 
-            if (process.env.SEND_EMAIL) sendTicketEmail({ tickets: input, email })
+            if (process.env.SEND_EMAIL) void sendTicketEmail({ tickets: input, email })
 
             return await Promise.all(input.map(async ticket => {
                 try {
