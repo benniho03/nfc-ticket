@@ -6,7 +6,7 @@ function NavBar() {
   const [navbar, setNavbar] = useState(false);
   return (
     <div>
-      <nav className="w-full bg-slate-900 fixed top-0 left-0 right-0 z-10 mb-4 ">
+      <nav className="w-full bg-transparent fixed top-0 left-0 right-0 z-10 mb-4 ">
         <div className="justify-between px-4 mx-auto lg:max-w-7xl md:items-center md:flex md:px-8">
           <div>
             <div className="flex items-center justify-between py-3 md:py-5 md:block">
@@ -42,18 +42,18 @@ function NavBar() {
                 navbar ? 'p-12 md:p-0 block' : 'hidden'
               }`}
             >
-              <ul className="h-screen md:h-auto items-center justify-center md:flex ">
-                <li className="pb-6 text-2xl text-white py-2 md:px-6 text-center border-b-2 md:border-b-0  hover:bg-pink-700  border-pink-700  md:hover:text-pink-700 md:hover:bg-transparent">
+              <ul className="h-screen md:h-auto items-center justify-center md:flex font-semibold ">
+                <li className=" text-2xl text-white py-2 md:px-6 text-center border-b-2 md:border-b-0  hover:bg-pink-700  border-pink-700  md:hover:text-pink-700 md:hover:bg-transparent">
                   <Link href="/admin" onClick={() => setNavbar(!navbar)}>
                     Admin
                   </Link>
                 </li>
-                <li className="pb-6 text-2xl text-white py-2 px-6 text-center  border-b-2 md:border-b-0  hover:bg-pink-700  border-pink-700  md:hover:text-pink-700 md:hover:bg-transparent">
+                <li className=" text-2xl text-white py-2 px-6 text-center  border-b-2 md:border-b-0  hover:bg-pink-700  border-pink-700  md:hover:text-pink-700 md:hover:bg-transparent">
                   <Link href="/event" onClick={() => setNavbar(!navbar)}>
                     Events
                   </Link>
                 </li>
-                <li className="pb-6 text-2xl text-white py-2 px-6 text-center  border-b-2 md:border-b-0  hover:bg-pink-700 border-pink-700  md:hover:text-pink-700 md:hover:bg-transparent">
+                <li className=" text-2xl text-white py-2 text-center  border-b-2 md:border-b-0  hover:bg-pink-700 border-pink-700  md:hover:text-pink-700 md:hover:bg-transparent">
                   <Link href="/event/create" onClick={() => setNavbar(!navbar)}>
                     Event erstellen
                   </Link>
