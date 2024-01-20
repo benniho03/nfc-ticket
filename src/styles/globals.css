@@ -69,6 +69,11 @@
   }
   
   body {
-    @apply bg-background text-foreground;
+    @apply bg-slate-900 text-foreground;
   }
+}
+
+.outlinetext{
+  -webkit-text-stroke-width: 5px;
+  -webkit-text-stroke-color: white;
 }

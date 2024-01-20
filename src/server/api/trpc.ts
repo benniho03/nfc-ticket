@@ -12,6 +12,8 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 
 import { db } from "@/server/db";
+import { currentUser, getAuth } from "@clerk/nextjs/server";
+import { clerkClient } from "@clerk/nextjs";
 
 /**
  * 1. CONTEXT
@@ -45,8 +47,16 @@ const createInnerTRPCContext = (_opts: CreateContextOptions) => {
  *
  * @see https://trpc.io/docs/context
  */
-export const createTRPCContext = (_opts: CreateNextContextOptions) => {
-  return createInnerTRPCContext({});
+export const createTRPCContext = (opts: CreateNextContextOptions) => {
+  const { req } = opts;
+  const sesh = getAuth(req);
+
+  const userId = sesh.userId;
+
+  return {
+    db,
+    userId,
+  };
 };
 
 /**
@@ -93,3 +103,11 @@ export const createTRPCRouter = t.router;
  * are logged in.
  */
 export const publicProcedure = t.procedure;
+
+/**
+ * Authenticated procedure
+ *
+ * This is the same as `publicProcedure`, but it guarantees that the user is logged in.
+ *
+ * @see https://trpc.io/docs/context#-trpcsession
+ */
