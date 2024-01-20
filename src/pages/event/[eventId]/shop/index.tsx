@@ -76,7 +76,7 @@ export default function Shop({ eventId }: InferGetServerSidePropsType<typeof get
         <>
             <div className="bg-slate-900 min-h-screen">
                 <div className="container py-2">
-                    <h1 className="text-slate-200 font-bold text-6xl">Ticket-Shop yeah für {event.name}</h1>
+                    <h1 className="text-slate-200 font-bold text-6xl">{event.name}</h1>
                 </div>
                 <div className="container py-3 bg-slate-700 text-slate-50">
                     <p>

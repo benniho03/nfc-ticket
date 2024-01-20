@@ -29,18 +29,16 @@ export default function Page({ eventId }: InferGetServerSidePropsType<typeof get
         );
     const userId = user?.id;
 
-
     if (!userId) return <div>Not signed in</div>;
 
     if (!event) return <div>404</div>;
 
     return (
         <>
-
             <div className="container">
-                <h1 className=" mb-6  text-6xl font-bold">DEIN EVENT</h1>
+                <h1 className="mb-6 text-6xl font-bold text-white">DEIN EVENT</h1>
 
-                <div className="flex bg-slate-700">
+                <div className="flex bg-slate-700 text-slate-50">
                     <div className="md:w-1/2 ">
                         <img className="object-cover w-full" src={event.imageUrl} />
                     </div>
@@ -53,12 +51,16 @@ export default function Page({ eventId }: InferGetServerSidePropsType<typeof get
                         <p className="py-4 text-2xl font-semibold">
                             Ticketpreis: {event.ticketPrice}
                         </p>
-                        <p className="py2">Maximale Besucher: {event.maxTicketAmount}</p>
-                        <p>
+                        <p className="py-2">Maximale Besucher: {event.maxTicketAmount}</p>
+                        <p className="mb-2">
                             Noch verfügbare Tickets: {event.maxTicketAmount - event.ticketsSold}
                             /{event.maxTicketAmount}
                         </p>
-                        <Link href={event.id + "/shop"}>Shop</Link>
+                        <div className="flex">
+                            <Button>
+                                <Link href={event.id + "/shop"}>Zum Shop</Link>
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </div >
@@ -82,7 +84,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext<{ ev
         router: appRouter,
         ctx: {
             db,
-      userId: null
+            userId: null
         },
         transformer: superjson,
     });
