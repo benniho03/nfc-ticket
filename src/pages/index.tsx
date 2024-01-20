@@ -7,9 +7,6 @@ import { Button } from "@/components/ui/button";
 import Footer from "@/components/footer-navigation";
 
 export default function Home() {
-  const { user, isSignedIn } = useUser();
-
-  if (!isSignedIn) return <div>Not signed in</div>;
 
   return (
     <>
