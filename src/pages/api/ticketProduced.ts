@@ -10,6 +10,10 @@ const requestSchema = z.object({
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
+    if (req.body.API_KEY !== process.env.APP_API_KEY) {
+        res.status(403).json({ message: "Auth failed." })
+        return
+    }
 
     if (req.method !== 'POST') {
         res.status(405).json({ message: 'Wrong HTTP-method', expected: 'POST' })
