@@ -12,7 +12,7 @@ export default authMiddleware({
     '/api/uploadthing',
     '/api/trpc/event(.*)',
     '/api/trpc/ticket(.*)',
-    "/api/ticketsProduced"
+    "/api/ticketProduced"
   ],
   ignoredRoutes: [
     '/api/ticketProduced',
