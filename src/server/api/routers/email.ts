@@ -6,6 +6,8 @@ import { Resend } from "resend";
 import { ticketOrderSchema } from "./events";
 import { render, renderAsync } from "@react-email/components";
 import TicketOrder from "@/components/email/TicketOrder";
+import fs from "fs/promises";
+import path from "path";
 
 export const emailRouter = createTRPCRouter({
   hello: publicProcedure
@@ -18,10 +20,11 @@ export const emailRouter = createTRPCRouter({
 });
 
 
-export const sendTicketEmail = async ({ tickets, email }: { tickets: z.infer<typeof ticketOrderSchema>, email: string }) => {
+export const sendTicketEmail = async ({ tickets, email, pdfBuffer }: { tickets: z.infer<typeof ticketOrderSchema>, email: string, pdfBuffer: Buffer }) => {
   const { data, error } = await sendEmail({
     recipient: email,
-    tickets: tickets
+    tickets,
+    pdfBuffer
   })
 
   if (error || !data) throw new TRPCError({
@@ -38,7 +41,7 @@ export const sendTicketEmail = async ({ tickets, email }: { tickets: z.infer<typ
 
 }
 
-export async function sendEmail(order: { recipient: string, tickets: z.infer<typeof ticketOrderSchema> }) {
+export async function sendEmail(order: { recipient: string, tickets: z.infer<typeof ticketOrderSchema>, pdfBuffer: Buffer }) {
   const resend = new Resend(process.env.RESEND_API_KEY)
 
   return await resend.emails.send({
@@ -49,6 +52,7 @@ export async function sendEmail(order: { recipient: string, tickets: z.infer<typ
     subject: 'Your tickets',
     html: await renderAsync(await TicketOrder({
       tickets: order.tickets
-    }))
+    })),
+    attachments: [{ filename: "Deine Bestellung", content: order.pdfBuffer }]
   })
 }
