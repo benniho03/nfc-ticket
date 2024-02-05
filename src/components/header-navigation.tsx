@@ -1,12 +1,14 @@
+import { SignIn, SignInButton, SignOutButton, useAuth } from '@clerk/nextjs';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 
-function NavBar() {
+function NavBar({ mainSite }: { mainSite?: boolean }) {
   const [navbar, setNavbar] = useState(false);
+  const { isSignedIn } = useAuth();
   return (
     <div>
-      <nav className="w-full bg-transparent fixed top-0 left-0 right-0 z-10 mb-4 ">
+      <nav className={`${mainSite ? "fixed" : ""} w-full bg-transparent top-0 left-0 right-0 z-10 mb-4`}>
         <div className="justify-between px-4 mx-auto lg:max-w-7xl md:items-center md:flex md:px-8">
           <div>
             <div className="flex items-center justify-between py-3 md:py-5 md:block">
@@ -50,9 +52,14 @@ function NavBar() {
                   </Link>
                 </li>
                 <li className="text-center border-b-2 md:border-b-0 hover:text-pink-700 md:hover:bg-transparent">
-                  <Link href="/event/create" onClick={() => setNavbar(!navbar)}>
-                    Event erstellen
-                  </Link>
+                  {isSignedIn ?
+                    <SignOutButton>
+                      Ausloggen
+                    </SignOutButton> :
+                    <SignInButton>
+                      Einloggen
+                    </SignInButton>
+                  }
                 </li>
               </ul>
             </div>

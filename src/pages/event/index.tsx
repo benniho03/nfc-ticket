@@ -1,10 +1,6 @@
 import { EventDetails } from "@/server/api/routers/events"
 import Link from "next/link"
 import { api, truncateText } from "@/utils/api"
-import toast from "react-hot-toast"
-import { useUser } from "@clerk/nextjs"
-import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
-import { EventSlider } from "@/components/event-slider"
 import NavBar from "@/components/header-navigation";
 import Footer from "@/components/footer-navigation"
 import superjson from "superjson"
@@ -13,46 +9,38 @@ import { createServerSideHelpers } from "@trpc/react-query/server"
 import { appRouter } from "@/server/api/root"
 import { SelectFilter } from "@/components/filter"
 import { useState } from "react"
+import LoadingSpinner from "@/components/loading-spinner"
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function EventOverview() {
 
     const { data: allEvents, isLoading, error } = api.event.getAll.useQuery()
 
     const [sortBy, setSortBy] = useState<SortOptions>("DATE")
+    const [searchTerm, setSearchTerm] = useState("")
 
-    if (isLoading) return console.log("Loading?")
+    if (isLoading) return <LoadingSpinner />
     if (error) return <div>An Error Occured</div>
 
-    const { user, isLoaded, isSignedIn } = useUser()
+    if (!allEvents.length) return <div>No Events found</div>
 
-    if (!isSignedIn || !isLoaded || !user) return <div>Not signed in</div>
-
-
-    if (!allEvents) return <div>No Events found</div>
     return (
         <>
-
-            <div className="mb-14">
-                <NavBar />
-            </div>
+            <NavBar />
             <div className="max-w-6xl mx-auto mt-3">
-                <h1 className="font-black text-8xl text-white">Event Overview</h1>
-                <div className="mb-3">
+                <h1 className="font-black text-8xl text-white mb-5">Event Overview</h1>
+                <div className="flex justify-between gap-3 mb-3">
+                    <Input onChange={e => setSearchTerm(e.target.value)} className="bg-transparent text-white placeholder:text-slate-200" placeholder="Nach was suchst du?" />
                     <SelectFilter setSortBy={setSortBy} />
                 </div>
-                <div className="flex flex-wrap gap-5">
+                <div className="grid grid-cols-4 grid-flow-row gap-4">
                     {
-                        sortEvents(allEvents, sortBy).map((event) => (
+                        sortEvents(allEvents, sortBy).filter(event => event.name.includes(searchTerm)).map((event) => (
                             <EventDisplay {...event} />
                         ))
                     }
                 </div>
-            </div>
-
-            <div className="max-w-[40%] mx-auto pt-11 ">
-                {/* <div className="flex flex-wrap gap-2">
-                    <EventSlider events={sortEvents(allEvents, "DATE")} />
-                </div> */}
             </div>
             <Footer />
         </>
@@ -63,9 +51,9 @@ function EventDisplay(event: EventDetails) {
 
     return (
 
-        <div className="w-1/2 sm:w-1/3 md:w-1/4 flex flex-col bg-slate-700">
+        <div className="flex flex-col bg-slate-700 rounded-lg">
             <img
-                className="w-full object-cover aspect-video"
+                className="w-full object-cover aspect-video rounded-t-lg"
                 src={event.imageUrl}
                 alt={event.name} />
             <div className="p-3">
@@ -74,10 +62,14 @@ function EventDisplay(event: EventDetails) {
                 <p className="font-bold text-slate-300">Ort: {event.location}</p>
                 <p className="font-bold text-slate-300">Preis: {event.ticketPrice}€</p>
                 <p className="text-slate-50 mt-3">{truncateText(event.description, 100)}</p>
-                <div className="w-1/2 rounded text-center px-2 py-1 bg-pink-700 text-white mt-4">
-                    <Link href={`/event/${event.id}`}>
-                        Zum Event
-                    </Link>
+                <div className="flex justify-center text-center px-2 py-1 mt-4">
+                    <div className="w-3/4">
+                        <Link href={`/event/${event.id}`}>
+                            <Button className="w-full bg-pink-700 text-white">
+                                Zum Event
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>
@@ -110,7 +102,9 @@ export async function getServerSideProps() {
     });
 
 
+
     await ssr.event.getAll.prefetch()
+
 
     return {
         props: {
