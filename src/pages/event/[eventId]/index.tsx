@@ -1,5 +1,5 @@
 import { api } from "@/utils/api";
-import { SignInButton, auth, useUser } from "@clerk/nextjs";
+import { SignInButton, useUser } from "@clerk/nextjs";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { createServerSideHelpers } from '@trpc/react-query/server';
 import superjson from 'superjson';
@@ -38,8 +38,8 @@ export default function Page({ eventId }: InferGetServerSidePropsType<typeof get
             <div className="container">
                 <h1 className="mb-6 text-6xl font-bold text-white">DEIN EVENT</h1>
 
-                <div className="flex bg-slate-700 text-slate-50">
-                    <div className="md:w-1/2 ">
+                <div className="flex bg-slate-700 text-slate-50 rounded-lg">
+                    <div className="md:w-1/2 rounded-l-lg ">
                         <img className="object-cover w-full" src={event.imageUrl} />
                     </div>
                     <div className="flex md:w-1/2 flex-col p-10 text-xl ">

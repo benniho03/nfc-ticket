@@ -20,18 +20,20 @@ export function SelectFilter({ setSortBy }: { setSortBy: React.Dispatch<React.Se
   ]
 
   return (
-    <Select onValueChange={(value) => setSortBy(value as SortOptions)}>
-      <SelectTrigger className="bg-transparent text-slate-50 placeholder:text-slate-50 border-2">
-        <SelectValue placeholder="Filter" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          <SelectLabel className="text-slate-50">Filter</SelectLabel>
-          {
+    <div className="w-1/3">
+      <Select onValueChange={(value) => setSortBy(value as SortOptions)}>
+        <SelectTrigger className="bg-transparent text-slate-50 placeholder:text-slate-50 border-2">
+          <SelectValue placeholder="Filter" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectLabel>Nach was willst du filtern?</SelectLabel>
+            {
               options.map((option) => <SelectItem value={option.value}>{option.label}</SelectItem>)
-          }
-        </SelectGroup>
-      </SelectContent>
-    </Select>
+            }
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+    </div>
   )
 }  

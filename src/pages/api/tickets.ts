@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
+import { db } from '@/server/db'
 
 type ResponseData = SuccessfulValidation | InvalidUserInput | WrongHttpReq | NoTicketFound
 
@@ -64,10 +65,10 @@ export default async function handler(
         return
     }
 
-    // läuft nur so weit, wenn ticket OPEN ist
-    res.status(200).json({ message: 'Valid ticket', name: `${ticket.firstname} ${ticket.lastname}`, status: ticket.status })
     // status in DB muss auf Closed gesetzt werden
     ticketUsed(ticket.id, ticket.eventId)
+    // läuft nur so weit, wenn ticket OPEN ist
+    res.status(200).json({ message: 'Valid ticket', name: `${ticket.firstname} ${ticket.lastname}`, status: ticket.status })
 }
 
 function checkUserInput(userInput: unknown): userInput is TicketInfo {
@@ -75,8 +76,7 @@ function checkUserInput(userInput: unknown): userInput is TicketInfo {
 }
 
 async function getTicketInfo(ticketId: string, eventId: string) {
-    const prisma = new PrismaClient();
-    return await prisma.ticket.findFirst({
+    return await db.ticket.findFirst({
         where: {
             id: ticketId,
             eventId: eventId
@@ -85,8 +85,7 @@ async function getTicketInfo(ticketId: string, eventId: string) {
 }
 
 async function ticketUsed(ticketId: string, eventId: string) {
-    const prisma = new PrismaClient();
-    await prisma.ticket.update({
+    await db.ticket.update({
         where: {
             id: ticketId,
             eventId: eventId

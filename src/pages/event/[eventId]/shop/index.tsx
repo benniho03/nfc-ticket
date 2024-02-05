@@ -11,6 +11,7 @@ import { Form, FormLabel } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 import { useState } from "react";
+import NavBar from "@/components/header-navigation";
 
 type TicketShop = {
     tickets: {
@@ -75,10 +76,11 @@ export default function Shop({ eventId }: InferGetServerSidePropsType<typeof get
     return (
         <>
             <div className="bg-slate-900 min-h-screen">
+                <NavBar />
                 <div className="container py-2">
                     <h1 className="text-slate-200 font-bold text-6xl">{event.name}</h1>
                 </div>
-                <div className="container py-3 bg-slate-700 text-slate-50">
+                <div className="container py-3 bg-slate-700 text-slate-50 rounded-lg">
                     <p>
                         Noch verfügbare Tickets: {event.maxTicketAmount - ticketsSold}
                         /{event.maxTicketAmount}
