@@ -18,6 +18,7 @@ import { UploadFileResponse } from "uploadthing/client"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { SignInButton, useAuth } from "@clerk/nextjs"
 
 
 
@@ -39,6 +40,8 @@ const CreateEventSchema = z.object({
 
 export default function EventCreateWizard({ genres }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 
+    const { userId }  = useAuth()
+
     const [imageUrl, setImageUrl] = useState<string>("")
 
     const form = useForm<z.infer<typeof CreateEventSchema>>({
@@ -54,6 +57,12 @@ export default function EventCreateWizard({ genres }: InferGetServerSidePropsTyp
         }
     })
 
+    if(!userId) return (
+        <div>
+            Du musst als Admin eingeloggt sein.
+            <SignInButton />
+        </div>
+    )
 
     function onSubmit(eventDetails: z.infer<typeof CreateEventSchema>) {
         if (!imageUrl) return toast.error("Lade noch ein Bild von deinem Event hoch.")
