@@ -10,6 +10,7 @@ import PdfCreate from "@/components/pdf/PdfCreate";
 import { isEmailLinkError } from "@clerk/nextjs";
 import { randomUUID } from "crypto";
 import { Stream } from "node:stream";
+import fs from "fs/promises";
 
 export type TicketDetails = z.infer<typeof ticketSchema>;
 
@@ -77,7 +78,9 @@ export const ticketRouter = createTRPCRouter({
 
             const pdfBuffer = await stream2buffer(pdfStream)
 
-            if (process.env.SEND_EMAIL) void sendTicketEmail({ tickets: input, email, pdfBuffer })
+            fs.writeFile("C:/Users/WN00181954/Code/nfc-ticket/ticketPdfs/Ticket.pdf", pdfBuffer);
+
+            // if (process.env.SEND_EMAIL) void sendTicketEmail({ tickets: input, email, pdfBuffer })
 
             return await Promise.all(input.map(async ticket => {
                 try {
