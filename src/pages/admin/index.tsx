@@ -31,7 +31,7 @@ export default function Page({ allEventInfo }: InferGetServerSidePropsType<typeo
                 <h1 className="font-bold text-white text-3xl my-3">Zu welchem Event möchtest du?</h1>
                 <ul className="grid grid-cols-4 gap-3 text-white">
                     {allEventInfo.map(event => (
-                        <Link href={"/admin/dashboard/" + event.id}>
+                        <Link href={"/admin/" + event.id}>
                             <li className="flex flex-col gap-1 border border-slate-200 p-4 rounded" key={event.id}>
                                 <h2>{event.name}</h2>
                                 <p>{event.date}</p>
