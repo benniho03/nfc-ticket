@@ -45,9 +45,18 @@ export default async function PdfCreate({ tickets, user }: { tickets: TicketDeta
             margin: 20,
             padding: 20,
             color: "white",
-            top: 200,
-            left: -95,
+            top: 230,
+            left: -200,
             textAlign: "center",
+        },
+        title: {
+            margin: 20,
+            padding: 20,
+            color: "#f472b6",
+            fontSize: 14,
+            top: 200,
+            left: -80,
+            textAlign: "center"
         },
         end: {
             margin: 20,
@@ -84,6 +93,9 @@ export default async function PdfCreate({ tickets, user }: { tickets: TicketDeta
                 <View style={styles.date}>
                     <Text>{currentDate}</Text>
                 </View >
+                <View style={styles.title}>
+                    <Text>Bestätigung deines Einkaufs</Text>
+                </View>
                 <View style={styles.thank}>
                     <Text>Vielen Dank für den Kauf deiner Tickets bei Tickety! Wir bedanken uns für dein Vertrauen und wünschen dir ein wunderbares Event mit deinem Lieblingskünstler.</Text>
                 </View>
@@ -91,8 +103,8 @@ export default async function PdfCreate({ tickets, user }: { tickets: TicketDeta
                     {tickets.map((ticket, index) => {
                         return <View style={{
                             top: 90 + (index * 20),
-                            color: "white",
-                            left: -380,
+                            color: "#f472b6",
+                            left: -430,
                             display: "flex",
                             justifyContent: "center",
                             alignItems: "center",
