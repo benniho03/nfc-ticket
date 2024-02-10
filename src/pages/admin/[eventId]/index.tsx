@@ -1,7 +1,8 @@
-import NavBar from "@/components/header-navigation"
+import HeaderNavigation from "@/components/header-navigation"
 import PieChart from "@/components/piechart"
 import { UsersTable } from "@/components/users-table"
 import { api } from "@/utils/api"
+import { BanknotesIcon, CalendarIcon, MapIcon, MapPinIcon } from "@heroicons/react/24/outline"
 import { PrismaClient } from "@prisma/client"
 import { GetServerSideProps, GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import { useRouter } from "next/router"
@@ -47,12 +48,30 @@ export default function EventDashboard({ closedCount, openCount, users }: InferG
 
     return (
         <div>
-            <NavBar />
+            <HeaderNavigation />
             <div className="container mt-3 text-slate-50">
-                <h1 className="text-3xl font-bold">Admin Dashboard für {event.name}</h1>
-                <h2>{event.date.toLocaleString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' })}</h2>
-                <h2>{event.location}, {event.locationAdress}</h2>
-                <div style={{ width: '250px' }}>
+                <h1 className="text-3xl font-bold mb-3">{event.name}</h1>
+                <div className="mb-3">
+                    <div className="flex flex-col gap-1">
+                        <div className="flex gap-2 items-center">
+                            <MapPinIcon className="h-5 w-5 inline-block text-slate-50" />
+                            <p className="text-slate-200">{event.location}</p>
+                        </div>
+                        <div className="flex gap-2 items-center">
+                            <CalendarIcon className="h-5 w-5 inline-block text-slate-50" />
+                            <p className="text-slate-200">{event.date.toLocaleString('de-DE', { day: 'numeric', month: '2-digit', year: 'numeric' })}</p>
+                        </div>
+                        <div className="flex gap-2 items-center">
+                            <BanknotesIcon className="h-5 w-5 inline-block text-slate-50" />
+                            <p className="text-slate-200">{event.ticketPrice}€</p>
+                        </div>
+                        <div className="flex gap-2 items-center">
+                            <MapIcon className="h-5 w-5 inline-block text-slate-50" />
+                            <p className="text-slate-200">{event.locationAdress}</p>
+                        </div>
+                    </div>
+                </div>
+                <div className="mb-3" style={{ width: '250px' }}>
                     <PieChart label1="Verkaufte Tickets" label2="Unverkaufte Tickets" value1={event.ticketsSold} value2={event.maxTicketAmount - event.ticketsSold} />
                     {
                         (openCount != 0 && closedCount != 0) ? (
@@ -61,9 +80,11 @@ export default function EventDashboard({ closedCount, openCount, users }: InferG
                     }
                 </div>
 
-                <p>Generierter Umsatz: {event.ticketsSold * event.ticketPrice} €</p>
+                <p className="mb-3">Generierter Umsatz: <span className="font-bold">
+                    {event.ticketsSold * event.ticketPrice} €
+                </span></p>
 
-                <p>Teilnehmerliste</p>
+                <p className="text-2xl font-bold">Teilnehmerliste</p>
                 <UsersTable users={users} />
 
             </div>

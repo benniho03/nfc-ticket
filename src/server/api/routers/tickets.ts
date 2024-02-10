@@ -70,17 +70,12 @@ export const ticketRouter = createTRPCRouter({
                 code: "INTERNAL_SERVER_ERROR",
                 message: "No email found"
             })
-            console.log("benni hats gesagt", __dirname)
-            const fileId = randomUUID();
-            const pdfPath = "ticketPdfs";
 
             const pdfStream = await ReactPDF.renderToStream(await PdfCreate({ tickets: input, user: { ...user, email } }));
 
             const pdfBuffer = await stream2buffer(pdfStream)
 
-            fs.writeFile("C:/Users/WN00181954/Code/nfc-ticket/ticketPdfs/Ticket.pdf", pdfBuffer);
-
-            // if (process.env.SEND_EMAIL) void sendTicketEmail({ tickets: input, email, pdfBuffer })
+            if (process.env.SEND_EMAIL) void sendTicketEmail({ tickets: input, email, pdfBuffer })
 
             return await Promise.all(input.map(async ticket => {
                 try {

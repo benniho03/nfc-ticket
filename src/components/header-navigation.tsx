@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 
-function NavBar({ mainSite }: { mainSite?: boolean }) {
+function HeaderNavigation({ mainSite }: { mainSite?: boolean }) {
   const [navbar, setNavbar] = useState(false);
   const { isSignedIn } = useAuth();
   return (
@@ -43,7 +43,7 @@ function NavBar({ mainSite }: { mainSite?: boolean }) {
               <ul className="h-screen text-2xl text-white md:h-auto items-center justify-center md:flex font-semibold md:items-end md:gap-8">
                 <li className="text-center border-b-2 md:border-b-0  hover:bg-pink-700  border-pink-700  md:hover:text-pink-700 md:hover:bg-transparent">
                   <Link href="/admin" onClick={() => setNavbar(!navbar)}>
-                    Admin
+                    Verwaltung
                   </Link>
                 </li>
                 <li className="text-center border-b-2 md:border-b-0 hover:text-pink-700 md:hover:bg-transparent">
@@ -70,4 +70,4 @@ function NavBar({ mainSite }: { mainSite?: boolean }) {
   );
 }
 
-export default NavBar;
+export default HeaderNavigation;

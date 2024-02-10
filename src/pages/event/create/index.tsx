@@ -19,6 +19,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { SignInButton, useAuth } from "@clerk/nextjs"
+import HeaderNavigation from "@/components/header-navigation"
 
 
 
@@ -40,7 +41,7 @@ const CreateEventSchema = z.object({
 
 export default function EventCreateWizard({ genres }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 
-    const { userId }  = useAuth()
+    const { userId } = useAuth()
 
     const [imageUrl, setImageUrl] = useState<string>("")
 
@@ -57,7 +58,7 @@ export default function EventCreateWizard({ genres }: InferGetServerSidePropsTyp
         }
     })
 
-    if(!userId) return (
+    if (!userId) return (
         <div>
             Du musst als Admin eingeloggt sein.
             <SignInButton />
@@ -66,7 +67,6 @@ export default function EventCreateWizard({ genres }: InferGetServerSidePropsTyp
 
     function onSubmit(eventDetails: z.infer<typeof CreateEventSchema>) {
         if (!imageUrl) return toast.error("Lade noch ein Bild von deinem Event hoch.")
-
         mutate({ ...eventDetails, imageUrl })
     }
 
@@ -81,6 +81,7 @@ export default function EventCreateWizard({ genres }: InferGetServerSidePropsTyp
 
     return (
         <div className="bg-slate-900 min-h-screen">
+            <HeaderNavigation />
             <div className="container py-2">
                 <h1 className="text-slate-200 font-bold text-6xl">Neues Event</h1>
             </div>
