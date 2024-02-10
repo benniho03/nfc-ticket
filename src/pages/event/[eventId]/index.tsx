@@ -7,58 +7,63 @@ import { appRouter } from "@/server/api/root";
 import { db } from '@/server/db';
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import HeaderNavigation from "@/components/header-navigation";
+import { BanknotesIcon, MapIcon, MapPinIcon, CalendarIcon, MusicalNoteIcon } from "@heroicons/react/24/outline";
 
 export default function Page({ eventId }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-
-    const { user, isSignedIn } = useUser();
 
     const {
         data: event,
     } = api.event.getOne.useQuery({ eventId });
 
-    if (!event) return <div>
-        <h1 className="font-bold text-4xl">404</h1>
-        <Button><Link href="/event">Zurück</Link></Button>
-    </div>;
+    if (!event) return (
+        <div>
+            <h1 className="font-bold text-4xl">404</h1>
+            <Button><Link href="/event">Zurück</Link></Button>
+        </div>
+    )
 
-    if (!user || !isSignedIn)
-        return (
-            <div>
-                <SignInButton />
-            </div>
-        );
-    const userId = user?.id;
-
-    if (!userId) return <div>Not signed in</div>;
-
-    if (!event) return <div>404</div>;
 
     return (
         <>
+            <HeaderNavigation />
             <div className="container">
-                <h1 className="mb-6 text-6xl font-bold text-white">DEIN EVENT</h1>
-
                 <div className="flex bg-slate-700 text-slate-50 rounded-lg">
                     <div className="md:w-1/2 rounded-l-lg ">
                         <img className="object-cover w-full" src={event.imageUrl} />
                     </div>
-                    <div className="flex md:w-1/2 flex-col p-10 text-xl ">
-                        <h1 className="pt-3 text-4xl font-bold">{event.name}</h1>
-                        <p className="pb-2">{event.date.toLocaleDateString()}</p>
-                        <p className="py-1">{event.description}</p>
-                        <p className="py-1">Location: {event.location}</p>
-                        <p className="py-1">Adresse: {event.locationAdress}</p>
-                        <p className="py-4 text-2xl font-semibold">
-                            Ticketpreis: {event.ticketPrice}
-                        </p>
-                        <p className="py-2">Maximale Besucher: {event.maxTicketAmount}</p>
-                        <p className="mb-2">
-                            Noch verfügbare Tickets: {event.maxTicketAmount - event.ticketsSold}
-                            /{event.maxTicketAmount}
-                        </p>
-                        <div className="flex">
-                            <Button>
-                                <Link href={event.id + "/shop"}>Zum Shop</Link>
+                    <div className="flex flex-col md:w-1/2 p-10 text-xl h-auto justify-between">
+                        <div>
+                            <h1 className="pt-3 text-4xl font-extrabold mb-5">{event.name}</h1>
+                            <div className="mb-5">
+                                <div className="flex gap-4 font-bold flex-wrap">
+                                    <div className="flex gap-1 items-center bg-slate-800 px-4 py-1 rounded-3xl">
+                                        <MapPinIcon className="h-5 w-5 inline-block text-slate-50" />
+                                        <p className="text-slate-200">{event.location}</p>
+                                    </div>
+                                    <div className="flex gap-1 items-center bg-slate-800 px-4 py-1 rounded-3xl">
+                                        <MapIcon className="h-5 w-5 inline-block text-slate-50" />
+                                        <p className="py-1">{event.locationAdress}</p>
+                                    </div>
+                                    <div className="flex gap-1 items-center bg-slate-800 px-4 py-1 rounded-3xl">
+                                        <CalendarIcon className="h-5 w-5 inline-block text-slate-50" />
+                                        <p className="text-slate-200">{event.date.toLocaleDateString()}</p>
+                                    </div>
+                                    <div className="flex gap-1 items-center bg-slate-800 px-4 py-1 rounded-3xl">
+                                        <BanknotesIcon className="h-5 w-5 inline-block text-slate-50" />
+                                        <p className="text-slate-200">{event.ticketPrice}€</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <p className="py-1 text-2xl font-medium">{event.description}</p>
+                        </div>
+                        <div className="flex flex-col gap-3">
+                            <p className="mb-2">
+                                Noch {getRemainingTicketPercentage(event.maxTicketAmount, event.ticketsSold)}% der Tickets verfügbar!
+                            </p>
+                            <Button className="flex gap-2 ">
+                                <MusicalNoteIcon className="h-5 w-5 inline-block text-slate-50" />
+                                <Link href={event.id + "/shop"}>Jetzt buchen!</Link>
                             </Button>
                         </div>
                     </div>
@@ -68,12 +73,12 @@ export default function Page({ eventId }: InferGetServerSidePropsType<typeof get
     );
 }
 
-function getRemainingTicketPercentage(
+export function getRemainingTicketPercentage(
     maxTicketAmount: number,
     ticketsSold: number,
 ) {
     if (ticketsSold === 0) return 100;
-    return (1 - (maxTicketAmount / ticketsSold) * 100).toFixed();
+    return ((1 - (ticketsSold / maxTicketAmount)) * 100).toFixed();
 }
 
 

@@ -3,10 +3,16 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { ticketOrderSchema, ticketSchema } from "./events";
 import { TRPCError } from "@trpc/server";
-import { clerkClient } from "@clerk/nextjs/server";
+import { clerkClient, getAuth } from "@clerk/nextjs/server";
 import { sendTicketEmail } from "./email";
+import ReactPDF from '@react-pdf/renderer';
+import PdfCreate from "@/components/pdf/PdfCreate";
+import { isEmailLinkError } from "@clerk/nextjs";
+import { randomUUID } from "crypto";
+import { Stream } from "node:stream";
+import fs from "fs/promises";
 
-type TicketDetails = z.infer<typeof ticketSchema>;
+export type TicketDetails = z.infer<typeof ticketSchema>;
 
 export const ticketRouter = createTRPCRouter({
     getAll: publicProcedure.query(({ ctx }) => {
@@ -20,7 +26,6 @@ export const ticketRouter = createTRPCRouter({
     order: publicProcedure
         .input(ticketOrderSchema.min(1))
         .mutation(async ({ ctx, input }) => {
-          
             const ticketAmount = await ctx.db.event.findFirst({
                 where: {
                     id: input[0]?.eventId
@@ -36,7 +41,7 @@ export const ticketRouter = createTRPCRouter({
             if (ticketAmount.ticketsSold >= ticketAmount.maxTicketAmount) {
                 throw new TRPCError({ message: "no more tickets available", code: "BAD_REQUEST" })
             }
-          
+
             await ctx.db.event.update({
                 data: {
                     ticketsSold: ticketAmount.ticketsSold + input.length
@@ -66,7 +71,11 @@ export const ticketRouter = createTRPCRouter({
                 message: "No email found"
             })
 
-            if (process.env.SEND_EMAIL) void sendTicketEmail({ tickets: input, email })
+            const pdfStream = await ReactPDF.renderToStream(await PdfCreate({ tickets: input, user: { ...user, email } }));
+
+            const pdfBuffer = await stream2buffer(pdfStream)
+
+            if (process.env.SEND_EMAIL) void sendTicketEmail({ tickets: input, email, pdfBuffer })
 
             return await Promise.all(input.map(async ticket => {
                 try {
@@ -83,3 +92,5 @@ export const ticketRouter = createTRPCRouter({
             }))
         })
 });
+
+async function stream2buffer(stream: NodeJS.ReadableStream): Promise<Buffer> { return new Promise<Buffer>((resolve, reject) => { const _buf = Array<any>(); stream.on("data", chunk => _buf.push(chunk)); stream.on("end", () => resolve(Buffer.concat(_buf))); stream.on("error", err => reject(`error converting stream - ${err}`)); }); } 

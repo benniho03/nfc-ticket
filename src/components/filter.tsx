@@ -14,9 +14,9 @@ import { SortOptions } from "@/pages/event"
 
 export function SelectFilter({ setSortBy }: { setSortBy: React.Dispatch<React.SetStateAction<SortOptions>> }) {
   const options: { label: string, value: SortOptions }[] = [
-    { label: "Datum", value: "DATE" },
+    { label: "Datum absteigend", value: "DATE DESC" },
     { label: "Preis aufsteigend", value: "PRICE ASC" },
-    { label: "Preis absteigend", value: "PRICE DESC" }
+    { label: "Preis absteigend", value: "PRICE DESC" },
   ]
 
   return (
