@@ -3,28 +3,22 @@ import Link from "next/link"
 import { api, truncateText } from "@/utils/api"
 import HeaderNavigation from "@/components/header-navigation";
 import Footer from "@/components/footer-navigation"
-import superjson from "superjson"
 import { db } from "@/server/db"
-import { createServerSideHelpers } from "@trpc/react-query/server"
-import { appRouter } from "@/server/api/root"
 import { SelectFilter } from "@/components/filter"
 import { useState } from "react"
 import LoadingSpinner from "@/components/loading-spinner"
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { BanknotesIcon, CalendarIcon, MapPinIcon } from '@heroicons/react/24/solid'
+import { InferGetServerSidePropsType } from "next";
 
-export default function EventOverview() {
+export default function EventOverview({ events }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 
-    const { data: allEvents, isLoading, error } = api.event.getAll.useQuery()
 
     const [sortBy, setSortBy] = useState<SortOptions>("DATE ASC")
     const [searchTerm, setSearchTerm] = useState("")
 
-    if (isLoading) return <LoadingSpinner />
-    if (error) return <div>An Error Occured</div>
-
-    if (!allEvents.length) return <div>No Events found</div>
+    if (!events.length) return <div>No Events found</div>
 
     return (
         <>
@@ -37,7 +31,7 @@ export default function EventOverview() {
                 </div>
                 <div className="grid grid-cols-4 grid-flow-row gap-4">
                     {
-                        sortEvents(allEvents, sortBy)
+                        sortEvents(events.map(e => ({ ...e, date: new Date(e.date) })), sortBy)
                             .filter(event => event.name.includes(searchTerm))
                             .map((event) => {
                                 return (
@@ -70,7 +64,7 @@ export function EventDisplay(event: EventDetails) {
                     </div>
                     <div className="flex gap-2 items-center">
                         <CalendarIcon className="h-5 w-5 inline-block text-slate-50" />
-                        <p className="text-slate-200">{event.date.toLocaleDateString()}</p>
+                        <p className="text-slate-200">{new Date(event.date).toLocaleDateString()}</p>
                     </div>
                     <div className="flex gap-2 items-center">
                         <BanknotesIcon className="h-5 w-5 inline-block text-slate-50" />
@@ -110,24 +104,28 @@ function SortedEventSlider(event: EventDetails) {
 
 export async function getServerSideProps() {
 
-    const ssr = createServerSideHelpers({
-        router: appRouter,
-        ctx: {
-            db,
-            userId: null
-        },
-        transformer: superjson,
-    });
 
-
-
-    await ssr.event.getAll.prefetch()
-
+    const events = await db.event.findMany({
+        select: {
+            id: true,
+            name: true,
+            date: true,
+            location: true,
+            imageUrl: true,
+            ticketPrice: true,
+            description: true,
+            locationAdress: true,
+            maxTicketAmount: true,
+            ticketsSold: true
+        }
+    })
+    const eventsFormatted = events.map(event => ({
+        ...event,
+        date: event.date.toISOString()
+    }))
 
     return {
-        props: {
-            trpcState: ssr.dehydrate(),
-        }
+        props: { events: eventsFormatted }
     }
 }
 
