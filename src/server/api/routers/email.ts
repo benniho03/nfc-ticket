@@ -48,7 +48,7 @@ export async function sendEmail(order: { recipient: string, tickets: z.infer<typ
     // Hier sollte nachher eigentlich der User stehen, können aber nicht an Nutzer schicken, ohne Mail Server :(
     // to: [order.recipient],
     to: 'ben.holderle.21@lehre.mosbach.dhbw.de',
-    subject: 'Your tickets',
+    subject: 'Deine Tickets',
     html: await renderAsync(await TicketOrder({
       tickets: order.tickets
     })),

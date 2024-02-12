@@ -75,9 +75,15 @@ export const ticketRouter = createTRPCRouter({
 
             const pdfBuffer = await stream2buffer(pdfStream)
 
-            if (process.env.SEND_EMAIL) {
-
-                void sendTicketEmail({ tickets: input, email, pdfBuffer })
+            const { data, error } = await sendTicketEmail({ tickets: input, email, pdfBuffer })
+            if (data) console.log("Email versendet", data)
+            if (error) {
+                console.error("Email konnte nicht versendet werden", error)
+                throw new TRPCError({
+                    code: "INTERNAL_SERVER_ERROR",
+                    message: "Email konnte nicht versendet werden",
+                    cause: error
+                })
             }
 
             return await Promise.all(input.map(async ticket => {
