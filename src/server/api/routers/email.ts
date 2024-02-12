@@ -53,6 +53,6 @@ export async function sendEmail(order: { recipient: string, tickets: z.infer<typ
     html: await renderAsync(await TicketOrder({
       tickets: order.tickets
     })),
-    attachments: [{ filename: "Deine Bestellung", content: order.pdfBuffer }]
+    attachments: [{ filename: "Deine_Bestellung.pdf", content: order.pdfBuffer }]
   })
 }
