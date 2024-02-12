@@ -77,8 +77,6 @@ export default async function PdfCreate({ tickets, user }: { tickets: TicketDeta
         day: "2-digit",
     });
 
-    const currentTime = new Date().toLocaleTimeString()
-
     // Create Document Component
     return (
         <Document>

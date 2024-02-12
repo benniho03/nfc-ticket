@@ -29,8 +29,7 @@ export const sendTicketEmail = async ({ tickets, email, pdfBuffer }: { tickets: 
 
   if (error || !data) throw new TRPCError({
     code: "INTERNAL_SERVER_ERROR",
-    message: "Couldn't send the email",
-    cause: error
+    message: error?.message
   })
 
   return {

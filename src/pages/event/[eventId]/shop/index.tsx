@@ -50,8 +50,8 @@ export default function Shop({ eventId }: InferGetServerSidePropsType<typeof get
             toast.success("Tickets erfolgreich bestellt.")
             reset()
         },
-        onError() {
-            toast.error("Keine Tickets für dieses Event verfügbar.")
+        onError(error) {
+            toast.error("Fehler beim Bestellen der Tickets: " + error.message)
         }
     })
 
